@@ -7,7 +7,6 @@ import { useDispatch, useSelector } from 'react-redux';
 function ProductList({ onHomeClick }) {
     const [showCart, setShowCart] = useState(false);
     const [showPlants, setShowPlants] = useState(false); // State to control the visibility of the About Us page
-    const [addedToCart, setAddedToCart] = useState({});
     const dispatch = useDispatch();
     const cartItems = useSelector(state => state.cart.items)
 
@@ -15,6 +14,9 @@ function ProductList({ onHomeClick }) {
         (total, item) => total + item.quantity,
         0
     );
+
+    const isInCart = (plant) =>
+        cartItems.some(item => item.name === plant.name);
 
 
     const plantsArray = [
@@ -267,11 +269,6 @@ function ProductList({ onHomeClick }) {
 
     const handleAddToCart = (product) => {
         dispatch(addItem(product));
-
-        setAddedToCart((prevState) => ({
-            ...prevState,
-            [product.name]: true,
-        }));
     };
 
     return (
@@ -290,8 +287,12 @@ function ProductList({ onHomeClick }) {
 
                 </div>
                 <div style={styleObjUl}>
-                    <div> <a href="#" onClick={(e) => handlePlantsClick(e)} style={styleA}>Plants</a></div>
-                    <div style = {{position: 'relative'}}>
+                    <div>
+                        <a href="#" onClick={(e) => handlePlantsClick(e)} style={styleA}>
+                            Plants
+                        </a>
+                    </div>
+                    <div style={{ position: 'relative' }}>
                         <a href="#" onClick={(e) => handleCartClick(e)} style={styleA}>
                             <h1 className='cart'>
                                 <svg
@@ -345,14 +346,15 @@ function ProductList({ onHomeClick }) {
                                         <button
                                             className="product-button"
                                             onClick={() => handleAddToCart(plant)}
-                                            disabled={addedToCart[plant.name]}
+                                            disabled={isInCart(plant)}
                                             style={{
-                                                backgroundColor: addedToCart[plant.name] ? 'gray' : '#4CAF50',
-                                                cursor: addedToCart[plant.name] ? 'not-allowed' : 'pointer',
+                                                backgroundColor: isInCart(plant) ? 'gray' : '#4CAF50',
+                                                cursor: isInCart(plant) ? 'not-allowed' : 'pointer',
                                             }}
                                         >
-                                            {addedToCart[plant.name] ? 'Added to Cart' : 'Add to Cart'}
+                                            {isInCart(plant) ? 'Added to Cart' : 'Add to Cart'}
                                         </button>
+
                                     </div>
                                 ))}
                             </div>
